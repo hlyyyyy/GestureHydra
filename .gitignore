@@ -1,0 +1,46 @@
+# OS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Environments
+.venv/
+venv/
+env/
+.env
+
+# IDE
+.idea/
+.vscode/
+
+# Logs and outputs
+logs/
+outputs/*
+!outputs/.gitignore
+
+# Checkpoints
+checkpoints/*
+!checkpoints/.gitkeep
+
+# Data
+data/*
+!data/README.md
+
+# Media caches
+demo/generated/*
+!demo/generated/.gitkeep
+
+# Jupyter
+.ipynb_checkpoints/

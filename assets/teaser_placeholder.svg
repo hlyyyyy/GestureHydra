@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="720" viewBox="0 0 1600 720" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1600" y2="720" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F4F1E8"/>
+      <stop offset="1" stop-color="#E2EBF6"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="180" y1="160" x2="1420" y2="560" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A63D40"/>
+      <stop offset="0.5" stop-color="#457B9D"/>
+      <stop offset="1" stop-color="#2A9D8F"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="720" rx="32" fill="url(#bg)"/>
+  <rect x="60" y="60" width="1480" height="600" rx="28" fill="#FFFCF6" stroke="#1F2937" stroke-opacity="0.08" stroke-width="2"/>
+
+  <rect x="120" y="120" width="420" height="480" rx="24" fill="#FFF7ED" stroke="#A63D40" stroke-opacity="0.25" stroke-width="2"/>
+  <rect x="590" y="120" width="420" height="480" rx="24" fill="#F4FAFF" stroke="#457B9D" stroke-opacity="0.25" stroke-width="2"/>
+  <rect x="1060" y="120" width="420" height="480" rx="24" fill="#F2FBF7" stroke="#2A9D8F" stroke-opacity="0.25" stroke-width="2"/>
+
+  <text x="160" y="185" fill="#111827" font-family="Helvetica, Arial, sans-serif" font-size="36" font-weight="700">Input Speech</text>
+  <text x="630" y="185" fill="#111827" font-family="Helvetica, Arial, sans-serif" font-size="36" font-weight="700">GestureHYDRA</text>
+  <text x="1100" y="185" fill="#111827" font-family="Helvetica, Arial, sans-serif" font-size="36" font-weight="700">Generated Motion</text>
+
+  <rect x="165" y="230" width="330" height="8" rx="4" fill="#A63D40" fill-opacity="0.25"/>
+  <rect x="165" y="260" width="280" height="8" rx="4" fill="#A63D40" fill-opacity="0.18"/>
+  <rect x="165" y="290" width="310" height="8" rx="4" fill="#A63D40" fill-opacity="0.14"/>
+
+  <circle cx="800" cy="325" r="120" fill="url(#accent)" fill-opacity="0.12"/>
+  <circle cx="800" cy="325" r="84" fill="url(#accent)" fill-opacity="0.18"/>
+  <circle cx="800" cy="325" r="46" fill="url(#accent)"/>
+  <text x="670" y="500" fill="#334155" font-family="Helvetica, Arial, sans-serif" font-size="28" font-weight="600">Hybrid Modality Diffusion</text>
+  <text x="622" y="538" fill="#334155" font-family="Helvetica, Arial, sans-serif" font-size="28" font-weight="600">+ Cascaded-Synchronized RAG</text>
+
+  <path d="M1165 258C1198 230 1242 214 1288 214C1365 214 1432 257 1460 322" stroke="#2A9D8F" stroke-width="8" stroke-linecap="round"/>
+  <path d="M1185 415C1220 380 1267 362 1320 362C1376 362 1422 381 1455 418" stroke="#457B9D" stroke-width="8" stroke-linecap="round"/>
+  <path d="M1212 520C1254 486 1304 470 1360 470C1400 470 1435 478 1460 492" stroke="#A63D40" stroke-width="8" stroke-linecap="round"/>
+
+  <path d="M505 350H585" stroke="#64748B" stroke-width="8" stroke-linecap="round" stroke-dasharray="10 14"/>
+  <path d="M1015 350H1095" stroke="#64748B" stroke-width="8" stroke-linecap="round" stroke-dasharray="10 14"/>
+  <path d="M568 335L590 350L568 365" stroke="#64748B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M1078 335L1100 350L1078 365" stroke="#64748B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <text x="120" y="655" fill="#475569" font-family="Helvetica, Arial, sans-serif" font-size="24">
+    Placeholder teaser. Replace this file with your project figure or change the README image path to the final teaser.
+  </text>
+</svg>

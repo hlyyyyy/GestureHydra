@@ -1,0 +1,57 @@
+cff-version: 1.2.0
+title: "GestureHYDRA"
+message: "If you use this repository, please cite the corresponding paper."
+type: software
+authors:
+  - family-names: Yang
+    given-names: Quanwei
+  - family-names: Huang
+    given-names: Luying
+  - family-names: Wang
+    given-names: Kaisiyuan
+  - family-names: Guan
+    given-names: Jiazhi
+  - family-names: He
+    given-names: Shengyi
+  - family-names: Li
+    given-names: Fengguo
+  - family-names: Zhou
+    given-names: Hang
+  - family-names: Yu
+    given-names: Lingyun
+  - family-names: Li
+    given-names: Yingying
+  - family-names: Feng
+    given-names: Haocheng
+  - family-names: Xie
+    given-names: Hongtao
+repository-code: "https://github.com/<your-org>/GestureHYDRA"
+url: "https://mumuwei.github.io/GestureHYDRA/"
+preferred-citation:
+  type: article
+  title: "GestureHYDRA: Semantic Co-speech Gesture Synthesis via Hybrid Modality Diffusion Transformer and Cascaded-Synchronized Retrieval-Augmented Generation"
+  authors:
+    - family-names: Yang
+      given-names: Quanwei
+    - family-names: Huang
+      given-names: Luying
+    - family-names: Wang
+      given-names: Kaisiyuan
+    - family-names: Guan
+      given-names: Jiazhi
+    - family-names: He
+      given-names: Shengyi
+    - family-names: Li
+      given-names: Fengguo
+    - family-names: Zhou
+      given-names: Hang
+    - family-names: Yu
+      given-names: Lingyun
+    - family-names: Li
+      given-names: Yingying
+    - family-names: Feng
+      given-names: Haocheng
+    - family-names: Xie
+      given-names: Hongtao
+  year: 2025
+  journal: "arXiv preprint arXiv:2507.22731"

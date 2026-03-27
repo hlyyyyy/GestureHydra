@@ -1,0 +1,24 @@
+model:
+  name: GestureHYDRA
+  backbone: HybridModalityDiffusionTransformer
+  latent_dim: 256
+  condition_modalities:
+    audio: true
+    text: true
+    speaker_identity: true
+  gesture_encoder:
+    enabled: true
+    masking_strategy: random_spans
+  retrieval:
+    enabled: true
+    strategy: cascaded_synchronized_rag
+    repository_path: data/streamer/retrieval_repository
+    top_k: 1
+  editing_modes:
+    - generation
+    - gesture_injection
+    - inbetweening
+    - segment_replacement
+  notes:
+    - This is a placeholder config for the public scaffold.
+    - Replace latent sizes and module details with the final implementation values.

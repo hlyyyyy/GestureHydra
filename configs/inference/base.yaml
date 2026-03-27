@@ -1,0 +1,19 @@
+inference:
+  output_dir: outputs/inference/default
+  checkpoint_path: checkpoints/gesturehydra.pt
+  mode: generation
+  save_video: true
+  save_motion: true
+  retrieval_guidance: true
+  sync_audio_and_gesture: true
+
+editing:
+  gesture_injection:
+    enabled: false
+    keyframe_mask_path: null
+  inbetweening:
+    enabled: false
+    anchor_motion_path: null
+  segment_replacement:
+    enabled: false
+    target_segment_path: null
