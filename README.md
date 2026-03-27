@@ -25,6 +25,7 @@
 
 [![arXiv](https://img.shields.io/badge/arXiv-2507.22731-b31b1b.svg)](https://arxiv.org/abs/2507.22731v2)
 [![Project Page](https://img.shields.io/badge/Project-Page-blue.svg)](https://mumuwei.github.io/GestureHYDRA/)
+[![Dataset](https://img.shields.io/badge/HuggingFace-Dataset-FFD21E?logo=huggingface&logoColor=000)](https://huggingface.co/datasets/mumuwei/Streamer)
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB.svg)](https://www.python.org/)
 
 </div>
@@ -133,6 +134,8 @@ GestureHydra/
 ```
 
 ## Dataset
+
+The Streamer dataset is available at: [mumuwei/Streamer on Hugging Face](https://huggingface.co/datasets/mumuwei/Streamer)
 
 The expected local dataset layout is:
 
