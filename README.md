@@ -26,7 +26,7 @@
 [![arXiv](https://img.shields.io/badge/arXiv-2507.22731-b31b1b.svg)](https://arxiv.org/abs/2507.22731v2)
 [![Project Page](https://img.shields.io/badge/Project-Page-blue.svg)](https://mumuwei.github.io/GestureHYDRA/)
 [![Dataset](https://img.shields.io/badge/HuggingFace-Dataset-FFD21E?logo=huggingface&logoColor=000)](https://huggingface.co/datasets/mumuwei/Streamer)
-[![Python](https://img.shields.io/badge/Python-3.10+-3776AB.svg)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.9+-3776AB.svg)](https://www.python.org/)
 
 </div>
 
@@ -63,77 +63,8 @@ According to the paper appendix, the Streamer dataset includes:
 - Support for gesture editing settings including generation, gesture injection, in-betweening, and motion segment replacement.
 - A repository structure designed for training, inference, evaluation, demos, and future checkpoint release.
 
-## Results Preview
 
-<!-- The repository is organized to support the following qualitative result categories.
-
-| Semantic activation | Gesture injection | In-betweening | Segment replacement |
-| --- | --- | --- | --- |
-| Add side-by-side examples showing explicit semantic gestures triggered by speech. | Add examples that inject target semantic gestures into generated motion. | Add examples that fill missing motion spans while preserving continuity. | Add examples that replace undesired segments with synchronized target gestures. |
-
-Recommended media to add before public release:
-
-- `demo/semantic_activation.gif`
-- `demo/gesture_injection.gif`
-- `demo/inbetweening.gif`
-- `demo/segment_replacement.gif` -->
-
-## Installation
-
-```bash
-conda env create -f environment.yml
-conda activate gesturehydra
-pip install -e .
-```
-
-Inspect the current command-line interfaces with:
-
-```bash
-python3 scripts/train.py --help
-python3 scripts/infer.py --help
-python3 scripts/prepare_streamer.py --help
-```
-
-## Getting Started
-
-Example training command:
-
-```bash
-python3 scripts/train.py \
-  --config configs/data/streamer.yaml \
-  --config configs/model/gesturehydra_base.yaml \
-  --config configs/train/base.yaml
-```
-
-Example inference command:
-
-```bash
-python3 scripts/infer.py \
-  --config configs/data/streamer.yaml \
-  --config configs/model/gesturehydra_base.yaml \
-  --config configs/inference/base.yaml
-```
-
-## Repository Structure
-
-```text
-GestureHydra/
-|-- assets/                      # figures, teaser media, and project assets
-|-- checkpoints/                 # model checkpoints
-|-- configs/
-|   |-- data/                    # dataset configuration
-|   |-- inference/               # inference configuration
-|   |-- model/                   # model configuration
-|   `-- train/                   # training configuration
-|-- data/                        # local datasets, ignored by git
-|-- demo/                        # qualitative examples and demo outputs
-|-- outputs/                     # logs, predictions, and experiment artifacts
-|-- gesturehydra/                # project source package
-|-- scripts/                     # training, inference, and preprocessing entrypoints
-`-- tools/                       # one-off utilities
-```
-
-## Dataset
+## Data Preparation
 
 The Streamer dataset is available at: [mumuwei/Streamer on Hugging Face](https://huggingface.co/datasets/mumuwei/Streamer)
 
@@ -155,8 +86,83 @@ data/
         ├── audio_features
         └── gestures
 ```
+### 1. Convert PKL files to CPU
 
-Additional placeholder details are provided in [data/README.md](data/README.md).
+Raw gesture PKL files from SMPL-X optimization contain `losses_to_log` with CUDA
+tensors. This step removes that field, converts any remaining GPU tensors to CPU
+numpy, and overwrites the PKL files in-place.
+
+```shell
+python tools/convert_cpu.py
+```
+
+### 2. Generate CSV metadata
+
+Scan `data/streamer-dataset/` and produce train / test_seen / test_unseen CSV files
+together with `speaker_map.json` under `data/datasets/streamer/`:
+
+```shell
+python tools/prepare_csv.py
+```
+
+### 3. Extract audio features
+
+Extract WavLM + MFCC + mel-spectrogram + prosody + onset features from raw wav
+files and save as `.npy` under `data/streamer-dataset/{split}/audio_features/`:
+
+```shell
+python tools/generate_wavlm_feature.py --model_path ckpts/chinese-wav2vec2-large-fairseq-ckpt
+```
+
+### 4. Extract 3D keypoints (Optional for Training)
+
+Run SMPL-X forward kinematics on gesture pkl files to produce 3D joint
+positions under `data/streamer-dataset/{split}/keypoints_3d/`:
+
+```shell
+python tools/generate_keypoints_3d.py --body_model_path body_models
+```
+
+
+### 5. Generate WebDataset tar files (Optional for Training)
+
+Pack gesture PKL, audio features, and 3D keypoints into WebDataset tar shards
+for training under `data/streamer-dataset/{split}/tars/`:
+
+```shell
+python tools/generate_smplx_tar.py
+```
+
+This generates 30 tar shards for train, 10 for test_seen, and 10 for test_unseen
+by default. Adjust with `--num_tars` and `--num_workers`.
+
+
+## Rendering
+
+Render SMPLX body motion from gesture PKL files into video. Requires OSMesa
+for offscreen rendering.
+
+```shell
+# Render model predictions
+bash render/render.sh \
+    --pkl_file path/to/pkl_file\
+    --smplx_model_path path/to/smplx_model_npz
+
+# Render ground truth motion
+bash render/render.sh --pkl_file path/to/gt.pkl --mode gt --save_path output.mp4
+
+# Render with audio overlay
+bash render/render.sh --pkl_file path/to/pred.pkl --mode ours --audio path/to/audio.wav --save_path output.mp4
+```
+
+Key options:
+- `--pkl_file`: Input PKL file (ground truth or prediction). When `mode=ours`, the script will attempt to read `gt_path` from the PKL file automatically.
+- `--mode`: `gt` for ground truth, `ours` for model predictions.
+- `--smplx_model_path`: Path to the SMPLX model file (e.g. `SMPLX_MALE_shape2019_exp2020.npz`).
+- `--gt_file`: Explicit path to the GT PKL file (optional, overrides `gt_path` in PKL).
+- `--audio`: Audio file to overlay on the output video.
+- `--save_path`: Output video path (default: `output.mp4`).
+
 
 ## Citation
 
