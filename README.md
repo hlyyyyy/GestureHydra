@@ -107,7 +107,7 @@ python tools/prepare_csv.py
 
 ### 3. Extract audio features
 
-Extract WavLM + MFCC + mel-spectrogram + prosody + onset features from raw wav
+Extract WavLM from raw wav
 files and save as `.npy` under `data/streamer-dataset/{split}/audio_features/`:
 
 ```shell
