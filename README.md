@@ -68,6 +68,17 @@ According to the paper appendix, the Streamer dataset includes:
 
 The Streamer dataset is available at: [mumuwei/Streamer on Hugging Face](https://huggingface.co/datasets/mumuwei/Streamer)
 
+The body models can be downloaded from: [body_models.zip](https://huggingface.co/hlyyyyy/GestureHydra/resolve/main/body_models.zip)
+
+After extraction, the expected layout is:
+
+```text
+body_models/
+└── smplx
+    ├── SMPLX_MALE_shape2019_exp2020.npz
+    └── ...
+```
+
 The expected local dataset layout is:
 
 ```text
