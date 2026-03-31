@@ -86,15 +86,12 @@ data/
 `-- streamer-dataset
     ├── test_seen
     │   ├── anon_audios
-    │   ├── audio_features
     │   └── gestures
     ├── test_unseen
     │   ├── anon_audios
-    │   ├── audio_features
     │   └── gestures
     └── train
         ├── anon_audios
-        ├── audio_features
         └── gestures
 ```
 ### 1. Convert PKL files to CPU
@@ -173,6 +170,15 @@ Key options:
 - `--gt_file`: Explicit path to the GT PKL file (optional, overrides `gt_path` in PKL).
 - `--audio`: Audio file to overlay on the output video.
 - `--save_path`: Output video path (default: `output.mp4`).
+
+
+## Inference
+
+```shell
+bash inference.sh
+```
+
+`inference.sh` supports environment overrides such as `CHECKPOINT`, `OUT_DIR`, `INPUT_CSV`, `STYLE_CSV`, `SEED_LEN`, and `DEVICE`.
 
 
 ## Citation
