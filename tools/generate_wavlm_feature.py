@@ -9,7 +9,7 @@ Each .npy file has shape (T, 1024) containing WavLM features.
 Usage:
     python tools/generate_wavlm_feature.py \
         --dataset_root data/streamer-dataset \
-        --model_path   ckpts/chinese-wav2vec2-large-fairseq-ckpt \
+        --model_path   checkpoints/chinese-wav2vec2-large-fairseq-ckpt \
         --splits       train test_seen test_unseen \
         --device       cuda
 
@@ -79,7 +79,7 @@ def main():
     parser.add_argument(
         "--model_path",
         type=str,
-        default="ckpts/chinese-wav2vec2-large-fairseq-ckpt",
+        default="checkpoints/chinese-wav2vec2-large-fairseq-ckpt",
         help="Path to the chinese-wav2vec2 model checkpoint.",
     )
     parser.add_argument(

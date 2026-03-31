@@ -193,7 +193,7 @@ def parse_args():
     parser.add_argument('--gt_path', required=True, type=str,
                         help='Path to ground truth gesture pkl files')
     parser.add_argument('--fgd_model', type=str,
-                        default=os.path.join(SCRIPT_DIR, 'ckpts/fgd.pth'),
+                        default=os.path.join(SCRIPT_DIR, 'checkpoints/fgd.pth'),
                         help='Path to FGD model checkpoint')
     return parser
 

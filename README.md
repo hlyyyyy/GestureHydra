@@ -101,6 +101,12 @@ The Streamer dataset is available at: [mumuwei/Streamer on Hugging Face](https:/
 
 The body models can be downloaded from: [body_models.zip](https://huggingface.co/hlyyyyy/GestureHydra/resolve/main/body_models.zip)
 
+The audio feature extraction requires a pretrained Chinese wav2vec2 model from [TencentGameMate/chinese-wav2vec2-large](https://huggingface.co/TencentGameMate/chinese-wav2vec2-large):
+
+```shell
+huggingface-cli download TencentGameMate/chinese-wav2vec2-large --local-dir checkpoints/chinese-wav2vec2-large-fairseq-ckpt
+```
+
 After extraction, the expected layout is:
 
 ```text
@@ -150,7 +156,7 @@ Extract WavLM from raw wav
 files and save as `.npy` under `data/streamer-dataset/{split}/audio_features/`:
 
 ```shell
-python tools/generate_wavlm_feature.py --model_path ckpts/chinese-wav2vec2-large-fairseq-ckpt
+python tools/generate_wavlm_feature.py --model_path checkpoints/chinese-wav2vec2-large-fairseq-ckpt
 ```
 
 ### 4. Extract 3D keypoints (Optional for Training)
@@ -220,6 +226,8 @@ Key options:
 
 ## Inference
 
+Download the pretrained checkpoint: [model.pth](https://huggingface.co/hlyyyyy/GestureHydra/resolve/main/model.pth)
+
 ```shell
 bash inference.sh
 ```
@@ -229,11 +237,13 @@ bash inference.sh
 
 ## Evaluation
 
+Download the FGD evaluation model: [fgd.pth](https://huggingface.co/hlyyyyy/GestureHydra/resolve/main/fgd.pth)
+
 Compute the Fréchet Gesture Distance (FGD) between predicted and ground-truth gestures:
 
 ```shell
 cd evaluation
-bash eval.sh path/to/pred path/to/gt
+bash eval.sh path/to/pred path/to/gt path/to/fgd.pth
 ```
 
 

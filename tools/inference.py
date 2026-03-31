@@ -143,7 +143,7 @@ def parse_args():
                         default='data/datasets/streamer/smplx_wav_va_train.csv',
                         help='CSV file listing style reference samples')
     parser.add_argument('--wav2vec-model', type=str,
-                        default='ckpts/chinese-wav2vec2-large-fairseq-ckpt',
+                        default='checkpoints/chinese-wav2vec2-large-fairseq-ckpt',
                         help='Path to wav2vec2 model (used when pre-computed npy is missing)')
     args = parser.parse_args()
     return args
