@@ -1,9 +1,26 @@
 name: gesturehydra
 channels:
+  - pytorch
   - conda-forge
+  - defaults
 dependencies:
-  - python=3.10
+  - python=3.9
   - pip
-  - pyyaml>=6.0
   - pip:
-      - -e .
+      - torch==1.12.1+cu113
+      - torchvision==0.13.1+cu113
+      - torchaudio==0.12.1
+      - --extra-index-url https://download.pytorch.org/whl/cu113
+      - openmim
+      - mmcv-full==1.7.2
+      - transformers
+      - librosa
+      - scipy
+      - smplx
+      - easydict
+      - webdataset
+      - tqdm
+      - pydub
+      - praat-parselmouth
+      - packaging
+      - PyYAML>=6.0
