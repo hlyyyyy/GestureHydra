@@ -64,6 +64,37 @@ According to the paper appendix, the Streamer dataset includes:
 - A repository structure designed for training, inference, evaluation, demos, and future checkpoint release.
 
 
+## Getting Started
+
+### Environment
+
+The code is tested with Python 3.9, PyTorch 1.12.1, and CUDA 11.3.
+
+```shell
+conda create -n gesturehydra python=3.9 -y
+conda activate gesturehydra
+```
+
+### Install PyTorch
+
+```shell
+pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 \
+    --extra-index-url https://download.pytorch.org/whl/cu113
+```
+
+### Install mmcv
+
+```shell
+pip install openmim
+mim install mmcv-full==1.7.2
+```
+
+### Install other dependencies
+
+```shell
+pip install transformers librosa scipy smplx easydict webdataset tqdm pydub praat-parselmouth packaging PyYAML
+```
+
 ## Data Preparation
 
 The Streamer dataset is available at: [mumuwei/Streamer on Hugging Face](https://huggingface.co/datasets/mumuwei/Streamer)
@@ -145,6 +176,21 @@ This generates 30 tar shards for train, 10 for test_seen, and 10 for test_unseen
 by default. Adjust with `--num_tars` and `--num_workers`.
 
 
+## Training
+
+Single-GPU training:
+
+```shell
+bash train.sh path/to/config path/to/save
+```
+
+Multi-GPU training:
+
+```shell
+bash tools/dist_train.sh path/to/config path/to/save num_gpus
+```
+
+
 ## Rendering
 
 Render SMPLX body motion from gesture PKL files into video. Requires OSMesa
@@ -181,6 +227,16 @@ bash inference.sh
 `inference.sh` supports environment overrides such as `CHECKPOINT`, `OUT_DIR`, `INPUT_CSV`, `STYLE_CSV`, `SEED_LEN`, and `DEVICE`.
 
 
+## Evaluation
+
+Compute the Fréchet Gesture Distance (FGD) between predicted and ground-truth gestures:
+
+```shell
+cd evaluation
+bash eval.sh path/to/pred path/to/gt
+```
+
+
 ## Citation
 
 If you find this work useful in your research, please cite:
@@ -194,6 +250,6 @@ If you find this work useful in your research, please cite:
 }
 ```
 
-## Acknowledgement
+## License
 
-This repository is currently in the initial release stage. Before making the project fully public, please update the final repository URL in `CITATION.cff` and add the final software and data license. See [LICENSE_NOTICE.md](LICENSE_NOTICE.md) for the current release note.
+This project is licensed under the [Apache License 2.0](LICENSE).
