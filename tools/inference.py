@@ -72,6 +72,23 @@ _wav2vec_extractor = None
 _wav2vec_model = None
 
 
+def resolve_audio_feature_path(pkl_path):
+    """Resolve precomputed audio feature path for a gesture PKL.
+
+    Older internal data layouts may use ``anon_audio_features`` while the
+    open-source preparation pipeline writes to ``audio_features``. Prefer an
+    existing path and fall back to the standard open-source layout.
+    """
+    candidates = [
+        pkl_path.replace('/gestures/', '/anon_audio_features/').replace('.pkl', '.npy'),
+        pkl_path.replace('/gestures/', '/audio_features/').replace('.pkl', '.npy'),
+    ]
+    for candidate in candidates:
+        if os.path.exists(candidate):
+            return candidate
+    return candidates[-1]
+
+
 def _ensure_wav2vec(model_path, device):
     """Load wav2vec2 model on first call, reuse afterwards."""
     global _wav2vec_extractor, _wav2vec_model
@@ -296,8 +313,7 @@ def main():
         next(reader)
         for row in reader:
             pkl_path = row[1]
-            # npy_path = pkl_path.replace('/gestures/', '/audio_features/').replace('.pkl', '.npy')
-            npy_path = pkl_path.replace('/gestures/', '/anon_audio_features/').replace('.pkl', '.npy')
+            npy_path = resolve_audio_feature_path(pkl_path)
             datasets.append({
                 'wav_file': row[0],
                 'pkl_file': pkl_path,

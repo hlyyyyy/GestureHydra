@@ -7,13 +7,15 @@ dependencies:
   - python=3.9
   - pip
   - pip:
+      - numpy<2
       - torch==1.12.1+cu113
       - torchvision==0.13.1+cu113
       - torchaudio==0.12.1
       - --extra-index-url https://download.pytorch.org/whl/cu113
-      - openmim
+      - opencv-python<4.10
+      - --find-links https://download.openmmlab.com/mmcv/dist/cu113/torch1.12/index.html
       - mmcv-full==1.7.2
-      - transformers
+      - transformers==4.30.2
       - librosa
       - scipy
       - smplx
@@ -24,3 +26,5 @@ dependencies:
       - praat-parselmouth
       - packaging
       - PyYAML>=6.0
+      - tensorboard
+      - matplotlib

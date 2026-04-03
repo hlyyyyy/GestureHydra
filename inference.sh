@@ -11,7 +11,7 @@
 #   DEVICE=cpu INPUT_CSV=data/datasets/streamer/smplx_wav_va_test_unseen.csv bash inference.sh
 #
 # Environment:
-#   conda activate mogen
+#   conda activate gesturehydra
 
 set -euo pipefail
 

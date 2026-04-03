@@ -73,6 +73,7 @@ The code is tested with Python 3.9, PyTorch 1.12.1, and CUDA 11.3.
 ```shell
 conda create -n gesturehydra python=3.9 -y
 conda activate gesturehydra
+pip install --upgrade pip setuptools wheel
 ```
 
 ### Install PyTorch
@@ -85,15 +86,23 @@ pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 \
 ### Install mmcv
 
 ```shell
-pip install openmim
-mim install mmcv-full==1.7.2
+pip install mmcv-full==1.7.2 \
+    -f https://download.openmmlab.com/mmcv/dist/cu113/torch1.12/index.html
 ```
 
 ### Install other dependencies
 
 ```shell
-pip install transformers librosa scipy smplx easydict webdataset tqdm pydub praat-parselmouth packaging PyYAML
+pip install 'numpy<2' 'opencv-python<4.10' \
+    'transformers==4.30.2' librosa scipy smplx easydict webdataset tqdm \
+    pydub praat-parselmouth packaging PyYAML tensorboard matplotlib
 ```
+
+Notes:
+
+- `numpy<2` is required because PyTorch 1.12 / TorchVision 0.13 wheels are not compatible with NumPy 2.x.
+- `tensorboard` is required by the default MMCV `TensorboardLoggerHook` used in training configs.
+- `matplotlib` is imported by the SMPL-X utility module during model construction.
 
 ## Data Preparation
 
