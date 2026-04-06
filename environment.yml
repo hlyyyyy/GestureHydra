@@ -6,11 +6,13 @@ channels:
 dependencies:
   - python=3.9
   - pip
+  - setuptools=80.9.0
+  - wheel=0.45.1
   - pip:
       - numpy<2
       - torch==1.12.1+cu113
       - torchvision==0.13.1+cu113
-      - torchaudio==0.12.1
+      - torchaudio==0.12.1+cu113
       - --extra-index-url https://download.pytorch.org/whl/cu113
       - opencv-python<4.10
       - --find-links https://download.openmmlab.com/mmcv/dist/cu113/torch1.12/index.html
@@ -28,3 +30,10 @@ dependencies:
       - PyYAML>=6.0
       - tensorboard
       - matplotlib
+      - pyrender
+      - trimesh
+      - pyglet<2
+      - requests==2.32.3
+      - charset_normalizer==3.3.2
+      - chardet==5.2.0
+      - git+https://github.com/mmatl/pyopengl.git

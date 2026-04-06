@@ -8,7 +8,7 @@ initialize_smplx_model = False
 use_motion_style = True
 
 num_workers = 24
-batch_size = 128
+batch_size = 144
 
 find_unused_parameters = False
 
@@ -65,7 +65,7 @@ resume_from = None
 workflow = [('train', 1)]
 
 # optimizer
-optimizer = dict(type='Adam', lr=1e-5)
+optimizer = dict(type='Adam', lr=1e-4)
 optimizer_config = dict(grad_clip=None)
 # learning policy
 lr_config = dict(policy='step', step=[300000])

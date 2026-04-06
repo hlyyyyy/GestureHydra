@@ -69,6 +69,39 @@ FIXED_BODY_INDICES = [
     18, 19, 20, 21, 22, 23,
 ]
 
+def as_numpy_float32(value):
+    return np.asarray(value, dtype=np.float32).copy()
+
+
+def patch_smplx_create_mean_pose():
+    """Patch smplx mean-pose creation for older open-source releases."""
+
+    def _to_numpy(value):
+        if isinstance(value, torch.Tensor):
+            return value.detach().cpu().numpy()
+        return np.asarray(value)
+
+    def _create_mean_pose(self, data_struct, flat_hand_mean=False):
+        global_orient_mean = torch.zeros([3], dtype=self.dtype)
+        body_pose_mean = torch.zeros([self.NUM_BODY_JOINTS * 3], dtype=self.dtype)
+        jaw_pose_mean = torch.zeros([3], dtype=self.dtype)
+        leye_pose_mean = torch.zeros([3], dtype=self.dtype)
+        reye_pose_mean = torch.zeros([3], dtype=self.dtype)
+
+        pose_mean = np.concatenate([
+            _to_numpy(global_orient_mean),
+            _to_numpy(body_pose_mean),
+            _to_numpy(jaw_pose_mean),
+            _to_numpy(leye_pose_mean),
+            _to_numpy(reye_pose_mean),
+            _to_numpy(self.left_hand_mean),
+            _to_numpy(self.right_hand_mean),
+        ], axis=0)
+        return pose_mean
+
+    smplx.body_models.SMPLX.create_mean_pose = _create_mean_pose
+
+
 
 def to3d_local(data):
     """Convert 12-dim PCA hand pose to 45-dim full hand pose via components."""
@@ -191,7 +224,7 @@ def load_pkl_data(pkl_file_path, device='cuda'):
     data = mmcv.load(pkl_file_path)
     for key in data.keys():
         if isinstance(data[key], np.ndarray):
-            data[key] = torch.from_numpy(data[key]).to(device)
+            data[key] = torch.as_tensor(np.asarray(data[key]), dtype=torch.float32, device=device)
     data['batch_size'] = data['expression'].shape[0]
     return data
 
@@ -226,18 +259,18 @@ def get_gtdata(gt_file_path, to6d=False):
     with open(gt_file_path, 'rb') as f:
         data = pickle.load(f)
     try:
-        jaw_pose = np.array(data['jaw_pose'])
+        jaw_pose = as_numpy_float32(data['jaw_pose'])
     except KeyError:
         data = data[0]
 
-    jaw_pose = np.array(data['jaw_pose'])
-    leye_pose = np.array(data['leye_pose'])
-    reye_pose = np.array(data['reye_pose'])
-    global_orient = np.array(data['global_orient']).squeeze()
-    body_pose = np.array(data['body_pose_axis'])
-    left_hand_pose = np.array(data['left_hand_pose'])
-    right_hand_pose = np.array(data['right_hand_pose'])
-    expression = np.array(data['expression'])
+    jaw_pose = as_numpy_float32(data['jaw_pose'])
+    leye_pose = as_numpy_float32(data['leye_pose'])
+    reye_pose = as_numpy_float32(data['reye_pose'])
+    global_orient = as_numpy_float32(data['global_orient']).squeeze()
+    body_pose = as_numpy_float32(data['body_pose_axis'])
+    left_hand_pose = as_numpy_float32(data['left_hand_pose'])
+    right_hand_pose = as_numpy_float32(data['right_hand_pose'])
+    expression = as_numpy_float32(data['expression'])
 
     lower = LOWER_POSE.to(torch.float32)
     lower = lower.unsqueeze(0).repeat(data['jaw_pose'].shape[0], 1).numpy()
@@ -248,45 +281,47 @@ def get_gtdata(gt_file_path, to6d=False):
 
     # Adjust joint3 to account for changed global orientation
     global_rotation_mat = axis_angle_to_matrix(
-        torch.from_numpy(global_orient).reshape(-1, 1, 3)
+        torch.as_tensor(np.asarray(global_orient), dtype=torch.float32).reshape(-1, 1, 3)
     )
     node_3_mat = axis_angle_to_matrix(
-        torch.from_numpy(body_pose[:, [6, 7, 8]]).reshape(-1, 1, 3)
+        torch.as_tensor(np.asarray(body_pose[:, [6, 7, 8]]), dtype=torch.float32).reshape(-1, 1, 3)
     )
     global_mat_node_3 = global_rotation_mat @ node_3_mat
 
     global_orient = lower[:, 6:9]
     new_global_rotation_mat = axis_angle_to_matrix(
-        torch.from_numpy(global_orient).reshape(-1, 1, 3)
+        torch.as_tensor(np.asarray(global_orient), dtype=torch.float32).reshape(-1, 1, 3)
     )
     R_global_inv = new_global_rotation_mat.transpose(-1, -2)
     R_local_3 = torch.matmul(R_global_inv, global_mat_node_3)
     new_local_3 = matrix_to_axis_angle(R_local_3).reshape(-1, 3)
 
-    body_pose[:, [6, 7, 8]] = new_local_3
+    body_pose[:, [6, 7, 8]] = new_local_3.detach().cpu().numpy()
     body_pose[:, FIXED_BODY_INDICES] = lower[:, 9:]
 
-    full_body = np.concatenate(
-        (jaw_pose, leye_pose, reye_pose, global_orient,
-         body_pose, left_hand_pose, right_hand_pose),
-        axis=1,
-    )
+    full_body = np.concatenate([
+        as_numpy_float32(jaw_pose),
+        as_numpy_float32(leye_pose),
+        as_numpy_float32(reye_pose),
+        as_numpy_float32(global_orient),
+        as_numpy_float32(body_pose),
+        as_numpy_float32(left_hand_pose),
+        as_numpy_float32(right_hand_pose),
+    ], axis=1)
 
     hand_dim = right_hand_pose.shape[1]
     if hand_dim == 12:
         full_body = to3d_local(full_body).astype(np.float32)
 
     if to6d:
-        full_body = torch.from_numpy(full_body)
+        full_body = torch.as_tensor(np.asarray(full_body), dtype=torch.float32)
         full_body = matrix_to_rotation_6d(
             axis_angle_to_matrix(full_body.reshape(-1, 55, 3))
         ).reshape(-1, 330)
-        full_body = np.asarray(full_body)
+        full_body = as_numpy_float32(full_body)
 
-    poses = np.concatenate(
-        (full_body, expression), axis=1
-    )[np.newaxis, ...]
-    poses = torch.from_numpy(poses).to('cuda')
+    poses = np.concatenate([as_numpy_float32(full_body), as_numpy_float32(expression)], axis=1)[np.newaxis, ...]
+    poses = torch.as_tensor(np.asarray(poses), dtype=torch.float32, device='cuda')
     return poses
 
 
@@ -306,18 +341,18 @@ def get_ourdata(pred_file_path, to6d=False):
     with open(pred_file_path, 'rb') as f:
         data = pickle.load(f)
     try:
-        jaw_pose = np.array(data['jaw_pose'])
+        jaw_pose = as_numpy_float32(data['jaw_pose'])
     except (KeyError, TypeError):
         data = data[0]
 
-    jaw_pose = np.array(data['jaw_pose'])
-    leye_pose = np.array(data['leye_pose'])
-    reye_pose = np.array(data['reye_pose'])
+    jaw_pose = as_numpy_float32(data['jaw_pose'])
+    leye_pose = as_numpy_float32(data['leye_pose'])
+    reye_pose = as_numpy_float32(data['reye_pose'])
     global_orient = np.array(data['global_orient'])
-    body_pose = np.array(data['body_pose_axis'])
-    left_hand_pose = np.array(data['left_hand_pose'])
-    right_hand_pose = np.array(data['right_hand_pose'])
-    expression = np.array(data['expression'])
+    body_pose = as_numpy_float32(data['body_pose_axis'])
+    left_hand_pose = as_numpy_float32(data['left_hand_pose'])
+    right_hand_pose = as_numpy_float32(data['right_hand_pose'])
+    expression = as_numpy_float32(data['expression'])
 
     lower = LOWER_POSE.to(torch.float32)
     lower = lower.unsqueeze(0).unsqueeze(0).repeat(
@@ -325,11 +360,15 @@ def get_ourdata(pred_file_path, to6d=False):
     ).numpy()
     body_pose[:, :, FIXED_BODY_INDICES] = lower[:, :, 9:]
 
-    full_body = np.concatenate(
-        (jaw_pose, leye_pose, reye_pose, global_orient,
-         body_pose, left_hand_pose, right_hand_pose),
-        axis=2,
-    )
+    full_body = np.concatenate([
+        as_numpy_float32(jaw_pose),
+        as_numpy_float32(leye_pose),
+        as_numpy_float32(reye_pose),
+        as_numpy_float32(global_orient),
+        as_numpy_float32(body_pose),
+        as_numpy_float32(left_hand_pose),
+        as_numpy_float32(right_hand_pose),
+    ], axis=2)
 
     B = full_body.shape[0]
     hand_dim = right_hand_pose.shape[2]
@@ -340,16 +379,16 @@ def get_ourdata(pred_file_path, to6d=False):
         if hand_dim == 12:
             full_body_tmp = to3d_local(full_body_tmp).astype(np.float32)
         if to6d:
-            full_body_tmp = torch.from_numpy(full_body_tmp)
+            full_body_tmp = torch.as_tensor(np.asarray(full_body_tmp), dtype=torch.float32)
             full_body_tmp = matrix_to_rotation_6d(
                 axis_angle_to_matrix(full_body_tmp.reshape(-1, 55, 3))
             ).reshape(-1, 330)
-            full_body_tmp = np.asarray(full_body_tmp)
+            full_body_tmp = as_numpy_float32(full_body_tmp)
         full_body_list.append(full_body_tmp)
 
     full_body = np.stack(full_body_list, axis=0)
-    poses = np.concatenate((full_body, expression), axis=2)
-    poses = torch.from_numpy(poses).to('cuda')
+    poses = np.concatenate([as_numpy_float32(full_body), as_numpy_float32(expression)], axis=2)
+    poses = torch.as_tensor(np.asarray(poses), dtype=torch.float32, device='cuda')
     return poses
 
 
@@ -401,7 +440,7 @@ def render_gt(smplx_model, rendertool, gt_file, audio_path, save_path,
 
     with open(gt_file, 'rb') as f:
         betas = pickle.load(f)['betas']
-    betas = torch.from_numpy(betas).to('cuda')
+    betas = torch.as_tensor(np.asarray(betas), dtype=torch.float32, device='cuda')
 
     gt_3d = poses2pred_local(
         gt_3d.squeeze(), stand=False, fix_global=False
@@ -466,7 +505,7 @@ def render_ours(smplx_model, rendertool, pred_file, gt_file, audio_path,
                 data = data[0]
             betas = data['betas']
 
-    betas = torch.from_numpy(np.array(betas)).to('cuda')
+    betas = torch.as_tensor(np.asarray(betas), dtype=torch.float32, device='cuda')
 
     vertices_list = get_vertices(smplx_model, pred_3d, betas)
 
@@ -487,6 +526,7 @@ def build_smplx_model(smplx_model_path=None):
     Returns:
         SMPLX model on CUDA.
     """
+    patch_smplx_create_mean_pose()
     if smplx_model_path is None:
         smplx_model_path = os.path.join(
             _SCRIPT_DIR, 'render_model', 'smplx', 'SMPLX_NEUTRAL.npz'

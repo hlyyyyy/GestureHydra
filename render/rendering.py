@@ -17,9 +17,18 @@ import librosa
 import numpy as np
 import pyrender
 import trimesh
-from psbody.mesh import Mesh
 from scipy.io import wavfile
 from tqdm import tqdm
+
+try:
+    from psbody.mesh import Mesh
+except ImportError:
+    class Mesh(object):
+        """Minimal mesh container used by the renderer."""
+
+        def __init__(self, v=None, f=None):
+            self.v = v
+            self.f = f
 
 # Directory of this script
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))

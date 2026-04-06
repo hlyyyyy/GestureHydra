@@ -73,13 +73,14 @@ The code is tested with Python 3.9, PyTorch 1.12.1, and CUDA 11.3.
 ```shell
 conda create -n gesturehydra python=3.9 -y
 conda activate gesturehydra
-pip install --upgrade pip setuptools wheel
+pip install --upgrade pip
+pip install setuptools==80.9.0 wheel==0.45.1
 ```
 
 ### Install PyTorch
 
 ```shell
-pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 \
+pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1+cu113 \
     --extra-index-url https://download.pytorch.org/whl/cu113
 ```
 
@@ -95,14 +96,58 @@ pip install mmcv-full==1.7.2 \
 ```shell
 pip install 'numpy<2' 'opencv-python<4.10' \
     'transformers==4.30.2' librosa scipy smplx easydict webdataset tqdm \
-    pydub praat-parselmouth packaging PyYAML tensorboard matplotlib
+    pydub praat-parselmouth packaging PyYAML tensorboard matplotlib \
+    pyrender trimesh 'pyglet<2' \
+    requests==2.32.3 charset_normalizer==3.3.2 chardet==5.2.0
 ```
 
-Notes:
+### Install OSMesa-compatible PyOpenGL for rendering (Optional)
+
+`pyrender` with `PYOPENGL_PLATFORM=osmesa` requires the OSMesa-capable
+PyOpenGL fork recommended by the `pyrender` project. Install it after the
+packages above:
+
+```shell
+pip uninstall -y PyOpenGL
+pip install --no-build-isolation git+https://github.com/mmatl/pyopengl.git
+```
+
+#### One-click render dependency installer
+
+After activating `gesturehydra`, you can install the validated rendering stack with:
+
+```shell
+bash render/install_render_deps.sh
+```
+
+If `ffmpeg` and `libglu1-mesa` are already installed, or you do not have sudo
+access, use:
+
+```shell
+bash render/install_render_deps.sh --skip-system
+```
+
+<!-- This script intentionally pins `setuptools==80.9.0` and `wheel==0.45.1`
+because `torch==1.12.1` and `mmcv-full==1.7.2` still depend on
+`pkg_resources`, which breaks with newer `setuptools` releases. -->
+
+#### Install system packages for rendering
+
+`render/render.sh` additionally requires `ffmpeg` and `libGLU`. On Ubuntu:
+
+```shell
+sudo apt-get update
+sudo apt-get install -y ffmpeg libglu1-mesa
+```
+
+<!-- Notes:
 
 - `numpy<2` is required because PyTorch 1.12 / TorchVision 0.13 wheels are not compatible with NumPy 2.x.
+- `setuptools==80.9.0` and `wheel==0.45.1` are required because `torch==1.12.1` + `mmcv-full==1.7.2` still import `pkg_resources`.
 - `tensorboard` is required by the default MMCV `TensorboardLoggerHook` used in training configs.
 - `matplotlib` is imported by the SMPL-X utility module during model construction.
+- `pyrender`, `trimesh`, `pyglet<2`, `ffmpeg`, and `libglu1-mesa` are required for rendering.
+- OSMesa runtime libraries are also required. On this machine `libOSMesa.so` is already present, so no extra package was needed. -->
 
 ## Data Preparation
 
@@ -140,17 +185,8 @@ data/
         ├── anon_audios
         └── gestures
 ```
-### 1. Convert PKL files to CPU
 
-Raw gesture PKL files from SMPL-X optimization contain `losses_to_log` with CUDA
-tensors. This step removes that field, converts any remaining GPU tensors to CPU
-numpy, and overwrites the PKL files in-place.
-
-```shell
-python tools/convert_cpu.py
-```
-
-### 2. Generate CSV metadata
+### 1. Generate CSV metadata
 
 Scan `data/streamer-dataset/` and produce train / test_seen / test_unseen CSV files
 together with `speaker_map.json` under `data/datasets/streamer/`:
@@ -159,7 +195,7 @@ together with `speaker_map.json` under `data/datasets/streamer/`:
 python tools/prepare_csv.py
 ```
 
-### 3. Extract audio features
+### 2. Extract audio features
 
 Extract WavLM from raw wav
 files and save as `.npy` under `data/streamer-dataset/{split}/audio_features/`:
@@ -168,7 +204,7 @@ files and save as `.npy` under `data/streamer-dataset/{split}/audio_features/`:
 python tools/generate_wavlm_feature.py --model_path checkpoints/chinese-wav2vec2-large-fairseq-ckpt
 ```
 
-### 4. Extract 3D keypoints (Optional for Training)
+### 3. Extract 3D keypoints (Optional for Training)
 
 Run SMPL-X forward kinematics on gesture pkl files to produce 3D joint
 positions under `data/streamer-dataset/{split}/keypoints_3d/`:
@@ -178,7 +214,7 @@ python tools/generate_keypoints_3d.py --body_model_path body_models
 ```
 
 
-### 5. Generate WebDataset tar files (Optional for Training)
+### 4. Generate WebDataset tar files (Optional for Training)
 
 Pack gesture PKL, audio features, and 3D keypoints into WebDataset tar shards
 for training under `data/streamer-dataset/{split}/tars/`:
@@ -209,7 +245,9 @@ bash tools/dist_train.sh path/to/config path/to/save num_gpus
 ## Rendering
 
 Render SMPLX body motion from gesture PKL files into video. Requires OSMesa
-for offscreen rendering.
+for offscreen rendering. The rendering path has been verified in the
+`gesturehydra` environment after installing the extra Python and system
+dependencies listed above.
 
 ```shell
 # Render model predictions
@@ -246,13 +284,12 @@ bash inference.sh
 
 ## Evaluation
 
-Download the FGD evaluation model: [fgd.pth](https://huggingface.co/hlyyyyy/GestureHydra/resolve/main/fgd.pth)
+Download the FGD evaluation model: [fgd.pth](https://huggingface.co/hlyyyyy/GestureHydra/resolve/main/fgd.pth) and  pass an explicit path as the third argument.
 
 Compute the Fréchet Gesture Distance (FGD) between predicted and ground-truth gestures:
 
 ```shell
-cd evaluation
-bash eval.sh path/to/pred path/to/gt path/to/fgd.pth
+bash evaluation/eval.sh path/to/pred path/to/gt path/to/fgd.pth
 ```
 
 
@@ -261,11 +298,14 @@ bash eval.sh path/to/pred path/to/gt path/to/fgd.pth
 If you find this work useful in your research, please cite:
 
 ```bibtex
-@article{yang2025gesturehydra,
-  title   = {GestureHYDRA: Semantic Co-speech Gesture Synthesis via Hybrid Modality Diffusion Transformer and Cascaded-Synchronized Retrieval-Augmented Generation},
-  author  = {Quanwei Yang and Luying Huang and Kaisiyuan Wang and Jiazhi Guan and Shengyi He and Fengguo Li and Hang Zhou and Lingyun Yu and Yingying Li and Haocheng Feng and Hongtao Xie},
-  journal = {arXiv preprint arXiv:2507.22731},
-  year    = {2025}
+@misc{yang2025gesturehydrasemanticcospeechgesture,
+      title={GestureHYDRA: Semantic Co-speech Gesture Synthesis via Hybrid Modality Diffusion Transformer and Cascaded-Synchronized Retrieval-Augmented Generation}, 
+      author={Quanwei Yang and Luying Huang and Kaisiyuan Wang and Jiazhi Guan and Shengyi He and Fengguo Li and Hang Zhou and Lingyun Yu and Yingying Li and Haocheng Feng and Hongtao Xie},
+      year={2025},
+      eprint={2507.22731},
+      archivePrefix={arXiv},
+      primaryClass={cs.MM},
+      url={https://arxiv.org/abs/2507.22731}, 
 }
 ```
 

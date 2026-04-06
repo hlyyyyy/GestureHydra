@@ -1,46 +1,93 @@
-# OS
-.DS_Store
-
-# Python
+# Python cache and compiled artifacts
 __pycache__/
 *.py[cod]
+*$py.class
 *.so
-.Python
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
 
-# Build artifacts
+# Build and packaging artifacts
+.Python
 build/
 dist/
+downloads/
+.eggs/
 *.egg-info/
+*.egg
+.installed.cfg
+MANIFEST
+pip-wheel-metadata/
 
-# Environments
+# Test, coverage, and type-check caches
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.hypothesis/
+.mypy_cache/
+.tox/
+.cache/
+nosetests.xml
+coverage.xml
+*.cover
+
+# Logs and runtime files
+*.log
+logs/
+
+# Virtual environments and local env files
+.env
 .venv/
 venv/
 env/
-.env
+ENV/
+env.bak/
+venv.bak/
+.python-version
+env.sh
 
-# IDE
-.idea/
+# Editor and OS metadata
 .vscode/
-
-# Logs and outputs
-logs/
-outputs/*
-!outputs/.gitignore
-
-# Checkpoints
-checkpoints/*
-!checkpoints/.gitkeep
-
-# Data
-data/*
-!data/README.md
-
-# Media caches
-demo/generated/*
-!demo/generated/.gitkeep
-
-# Jupyter
+.idea/
+.ropeproject/
+.spyderproject
+.spyproject
 .ipynb_checkpoints/
+.DS_Store
+.claude/
+
+# Project outputs
+work_dirs/
+processed/
+
+# Large local assets and generated data
+/data/
+/data/streamer-dataset/
+/body_models/*
+!/body_models/.gitkeep
+/checkpoints/*
+!/checkpoints/.gitkeep
+/evaluation/ckpts/*
+!/evaluation/ckpts/.gitkeep
+/render/render_model/
+/render/streamer/
+/render/talkshow/
+/ckpts/
+
+# Model checkpoints and generated media
+*.pth
+*.pt
+*.mp4
+
+# Generated arrays and serialized results
+*.pkl
+*.pkl.json
+*.log.json
+*.pickle
+*.npz
+*.npy
+
+# Keep repository assets that are required by source code
+!/evaluation/data_utils/norm_stats.npy
+!/requirements.txt
+
+# Patch / merge leftovers
+*.orig
