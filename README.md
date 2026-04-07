@@ -307,6 +307,13 @@ If you find this work useful in your research, please cite:
       primaryClass={cs.MM},
       url={https://arxiv.org/abs/2507.22731}, 
 }
+@inproceedings{yang2025gesturehydra,
+  title={GestureHYDRA: Semantic Co-speech Gesture Synthesis via Hybrid Modality Diffusion Transformer and Cascaded-Synchronized Retrieval-Augmented Generation},
+  author={Yang, Quanwei and Huang, Luying and Wang, Kaisiyuan and Guan, Jiazhi and He, Shengyi and Li, Fengguo and Zhou, Hang and Yu, Lingyun and Li, Yingying and Feng, Haocheng and others},
+  booktitle={Proceedings of the IEEE/CVF International Conference on Computer Vision},
+  pages={12615--12625},
+  year={2025}
+}
 ```
 
 ## License
