@@ -298,15 +298,6 @@ bash evaluation/eval.sh path/to/pred path/to/gt path/to/fgd.pth
 If you find this work useful in your research, please cite:
 
 ```bibtex
-@misc{yang2025gesturehydrasemanticcospeechgesture,
-      title={GestureHYDRA: Semantic Co-speech Gesture Synthesis via Hybrid Modality Diffusion Transformer and Cascaded-Synchronized Retrieval-Augmented Generation}, 
-      author={Quanwei Yang and Luying Huang and Kaisiyuan Wang and Jiazhi Guan and Shengyi He and Fengguo Li and Hang Zhou and Lingyun Yu and Yingying Li and Haocheng Feng and Hongtao Xie},
-      year={2025},
-      eprint={2507.22731},
-      archivePrefix={arXiv},
-      primaryClass={cs.MM},
-      url={https://arxiv.org/abs/2507.22731}, 
-}
 @inproceedings{yang2025gesturehydra,
   title={GestureHYDRA: Semantic Co-speech Gesture Synthesis via Hybrid Modality Diffusion Transformer and Cascaded-Synchronized Retrieval-Augmented Generation},
   author={Yang, Quanwei and Huang, Luying and Wang, Kaisiyuan and Guan, Jiazhi and He, Shengyi and Li, Fengguo and Zhou, Hang and Yu, Lingyun and Li, Yingying and Feng, Haocheng and others},
