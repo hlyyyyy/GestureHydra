@@ -16,7 +16,7 @@
 set -euo pipefail
 
 CONFIG=${1:-configs/gesturehydra/infer.py}
-CHECKPOINT=${2:-work_dirs/stage2_audio.pth}
+CHECKPOINT=${2:-work_dirs/model.pth}
 OUT_DIR=${3:-work_dirs/style_infer_results_anon/}
 INPUT_CSV=${INPUT_CSV:-data/datasets/streamer/smplx_wav_va_test_seen.csv}
 STYLE_CSV=${STYLE_CSV:-data/datasets/streamer/smplx_wav_va_train.csv}
