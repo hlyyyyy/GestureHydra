@@ -273,7 +273,7 @@ Key options:
 
 ## Inference
 
-Download the pretrained checkpoint: [model.pth](https://huggingface.co/hlyyyyy/GestureHydra/resolve/main/model.pth)
+Download the pretrained checkpoint: [model.pth](https://huggingface.co/hlyyyyy/GestureHydra/resolve/main/model.pth), and put it in the 'work_dirs' folder.
 
 ```shell
 bash inference.sh
