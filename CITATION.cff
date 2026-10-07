@@ -25,10 +25,10 @@ authors:
     given-names: Haocheng
   - family-names: Xie
     given-names: Hongtao
-repository-code: "https://github.com/<your-org>/GestureHYDRA"
+repository-code: "https://github.com/hlyyyyy/GestureHydra"
 url: "https://mumuwei.github.io/GestureHYDRA/"
 preferred-citation:
-  type: article
+  type: conference-paper
   title: "GestureHYDRA: Semantic Co-speech Gesture Synthesis via Hybrid Modality Diffusion Transformer and Cascaded-Synchronized Retrieval-Augmented Generation"
   authors:
     - family-names: Yang
@@ -54,4 +54,8 @@ preferred-citation:
     - family-names: Xie
       given-names: Hongtao
   year: 2025
-  journal: "arXiv preprint arXiv:2507.22731"
+  month: 10
+  collection-title: "Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV)"
+  start: 12615
+  end: 12625
+  url: "https://openaccess.thecvf.com/content/ICCV2025/html/Yang_GestureHYDRA_Semantic_Co-speech_Gesture_Synthesis_via_Hybrid_Modality_Diffusion_Transformer_ICCV_2025_paper.html"
