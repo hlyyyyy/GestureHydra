@@ -113,34 +113,38 @@ def load_audio(wav_path, model_path, device):
     if len(wav.shape) > 1:
         wav = wav[0]
     target_length = int(len(wav) / sr * AUDIO_FPS)
-
-    # Chunked extraction (15s per chunk) to avoid OOM
+    
+    # Chunked extraction (15s per chunk, no boundary padding) to avoid OOM.
+    # Padding to a fixed 15s chunk would stretch the feature timeline ~1.5x for
+    # short clips and misalign gestures with speech; match the training-time
+    # extraction in tools/generate_wavlm_feature.py instead.
     wav_tensor = torch.FloatTensor(wav).unsqueeze(0).to(device)
     input_values = feature_extractor(
         wav_tensor, sampling_rate=AUDIO_SR, return_tensors="pt",
-    ).input_values.to(device)
+    ).input_values.squeeze(1).to(device)  # (1, N) single-channel
 
     chunk_len = AUDIO_SR * 15
     wav_len = input_values.shape[-1]
-    num_chunks = wav_len // chunk_len + 1
-    input_values = F.pad(input_values, (0, chunk_len * num_chunks - wav_len))
-    input_values = input_values.reshape(num_chunks, chunk_len)
-
     reps = []
-    for i in range(0, num_chunks, 10):
-        reps.append(model(input_values[i:i + 10]).last_hidden_state[0])
+    if wav_len <= chunk_len:
+        reps.append(model(input_values).last_hidden_state[0])
+    else:
+        num_chunks = wav_len // chunk_len + 1
+        for i in range(0, num_chunks, 10):
+            chunk = input_values[..., i * chunk_len:(i + 1) * chunk_len]
+            reps.append(model(chunk).last_hidden_state[0])
     rep = torch.cat(reps, dim=0)
 
-    # Interpolate to target frame count
+    # Interpolate to target frame count (align_corners=False, same as training)
     feat = F.interpolate(
         rep.unsqueeze(0).transpose(1, 2),
         size=target_length,
-        align_corners=True,
+        align_corners=False,
         mode='linear',
     ).transpose(1, 2).squeeze()  # (T, 1024)
 
     return feat.cpu().numpy()[np.newaxis]  # (1, T, 1024)
-
+   
 
 def parse_args():
     parser = argparse.ArgumentParser(description='gesturehydra style inference')
